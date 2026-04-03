@@ -21,7 +21,7 @@ function secondsToMinutesSeconds(seconds)
 async function getSongs(folder) 
 {
     currFolder = folder;
-    let a = await fetch(`http://127.0.0.1:8080/${currFolder}`)
+    let a = await fetch(`/${currFolder}`)
     let response = await a.text();
     let div = document.createElement("div")
     div.innerHTML = response;
@@ -44,7 +44,7 @@ async function getSongs(folder)
         let author = "";
         try 
         {
-            let infoRes = await fetch(`http://127.0.0.1:8080/${currFolder}/info.json`);
+            let infoRes = await fetch(`/${currFolder}/info.json`);
             if (infoRes.ok) 
             {
                 let info = await infoRes.json();
@@ -181,7 +181,7 @@ function updatePlayIcons(isPlaying, trackName)
 
 async function displayAlbums() 
 {
-    let a = await fetch(`http://127.0.0.1:8080/songs/`)
+    let a = await fetch(`/songs/`)
     let response = await a.text();
     let div = document.createElement("div")
     div.innerHTML = response;
@@ -197,11 +197,11 @@ async function displayAlbums()
             if (parts.length < 2) continue;
             let folder = parts[1];
             // Get the metadata of the folder
-            let a = await fetch(`http://127.0.0.1:8080/songs/${folder}/info.json`)
+            let a = await fetch(`/songs/${folder}/info.json`)
             let response = await a.json(); 
             // Check if cover.jpg exists, if not, check for cover.png
-            let coverUrlJpg = `http://127.0.0.1:8080/songs/${folder}/cover.jpg`;
-            let coverUrlPng = `http://127.0.0.1:8080/songs/${folder}/cover.png`;
+            let coverUrlJpg = `/songs/${folder}/cover.jpg`;
+            let coverUrlPng = `/songs/${folder}/cover.png`;
             let coverUrl = coverUrlJpg;
             // Try to fetch cover.jpg, if not found, use cover.png
             try 
@@ -322,7 +322,7 @@ async function main()
             playMusic(songs[index - 1])
         }
     })
-    
+
     // Add an event listener to next
     next.addEventListener("click", () => 
     {

@@ -183,72 +183,95 @@ function updatePlayIcons(isPlaying, trackName)
 
 async function displayAlbums() 
 {
-    let res = await fetch("/songs/index.json");
-    if (!res.ok) {
-        console.error("Cannot load albums");
-        return;
-    }
-    let folders = await res.json();
-    let cardContainer = document.querySelector(".cardContainer");
-    cardContainer.innerHTML = "";
-    for (let folder of folders) 
+    try 
     {
-        let info;
-        try {
-            let infoRes = await fetch(`/songs/${folder}/info.json`);
-            info = await infoRes.json();
-        } 
-        catch {
-            info = {
-                title: folder,
-                description: ""
-            };
-        }
-        // Check if cover.jpg exists, if not, check for cover.png
-        let coverUrlJpg = `/songs/${folder}/cover.jpg`;
-        let coverUrlPng = `/songs/${folder}/cover.png`;
-        let coverUrl = coverUrlJpg;
-        // Try to fetch cover.jpg, if not found, use cover.png
-        try 
+        let res = await fetch("/songs/index.json");
+
+        if (!res.ok) 
         {
-            let coverRes = await fetch(coverUrlJpg, { method: "HEAD" });
-            if (!coverRes.ok) 
+            console.error("Cannot load albums");
+            return;
+        }
+
+        let folders = await res.json();
+
+        let cardContainer = document.querySelector(".cardContainer");
+        cardContainer.innerHTML = "";
+
+        for (let folder of folders) 
+        {
+            let info;
+
+            try 
             {
-                coverRes = await fetch(coverUrlPng, { method: "HEAD" });
-                if (coverRes.ok) 
+                let infoRes = await fetch(`/songs/${folder}/info.json`);
+
+                if (infoRes.ok) 
                 {
-                    coverUrl = coverUrlPng;
+                    info = await infoRes.json();
+                } 
+                else 
+                {
+                    throw new Error("Missing info.json");
                 }
+            } 
+            catch 
+            {
+                info = {
+                    title: folder,
+                    description: ""
+                };
             }
-        } 
-        catch (e) 
-        {
-            coverUrl = coverUrlPng;
+
+            // Always start with JPG
+            let coverUrl = `/songs/${folder}/cover.jpg`;
+
+            cardContainer.innerHTML += `
+                <div data-folder="${folder}" class="card">
+
+                    <div class="play">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M5 20V4L19 12L5 20Z"
+                                stroke="#141B34"
+                                fill="#000"
+                                stroke-width="1.5"
+                                stroke-linejoin="round" />
+                        </svg>
+                    </div>
+
+                    <img 
+                        src="${coverUrl}"
+                        alt="${info.title}"
+                        onerror="this.onerror=null; this.src='/songs/${folder}/cover.png';"
+                    >
+
+                    <h2>${info.title}</h2>
+                    <p>${info.description}</p>
+
+                </div>
+            `;
         }
-        cardContainer.innerHTML = cardContainer.innerHTML + ` <div data-folder="${folder}" class="card">
-                                                                <div class="play">
-                                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                        <path d="M5 20V4L19 12L5 20Z" stroke="#141B34" fill="#000" stroke-width="1.5" stroke-linejoin="round" />
-                                                                    </svg>
-                                                                </div>
-                                                                <img src="${coverUrl}" alt="">
-                                                                <h2>${info.title}</h2>
-                                                                <p>${info.description}</p>
-                                                            </div>`
-    }
-    // Load the playlist whenever card is clicked
-    document.querySelectorAll(".card").forEach(card => {
-            card.addEventListener(
-                "click",
-                async e => {
-                    let folder = e.currentTarget.dataset.folder;
-                    songs = await getSongs(`songs/${folder}`);
-                    if (songs.length > 0) {
-                        playMusic(songs[0]);
-                    }
+
+        // Attach click events
+        document.querySelectorAll(".card").forEach(card => 
+        {
+            card.addEventListener("click", async e => 
+            {
+                let folder = e.currentTarget.dataset.folder;
+
+                songs = await getSongs(`songs/${folder}`);
+
+                if (songs && songs.length > 0) 
+                {
+                    playMusic(songs[0]);
                 }
-            );
+            });
         });
+    } 
+    catch (err) 
+    {
+        console.error("displayAlbums failed:", err);
+    }
 }
 
 async function main() 

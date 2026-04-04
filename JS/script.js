@@ -197,11 +197,11 @@ async function displayAlbums()
             if (parts.length < 2) continue;
             let folder = parts[1];
             // Get the metadata of the folder
-            let a = await fetch(`/${currFolder}/info.json`)
+            let a = await fetch(`/songs/${folder}/info.json`)
             let response = await a.json(); 
             // Check if cover.jpg exists, if not, check for cover.png
-            let coverUrlJpg = `/${currFolder}/cover.jpg`;
-            let coverUrlPng = `/${currFolder}/cover.png`;
+            let coverUrlJpg = `/songs/${folder}/cover.jpg`;
+            let coverUrlPng = `/songs/${folder}/cover.png`;
             let coverUrl = coverUrlJpg;
             // Try to fetch cover.jpg, if not found, use cover.png
             try 

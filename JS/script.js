@@ -40,23 +40,23 @@ async function getSongs(folder)
     // Show all the songs in the playlist
     let songUL = document.querySelector(".songList").getElementsByTagName("ul")[0]
     songUL.innerHTML = ""
+    // Fetch info.json for the current folder to get the author name
+    let author = "";
+    try 
+    {
+        let infoRes = await fetch(`/${currFolder}/info.json`);
+        if (infoRes.ok) 
+        {
+            let info = await infoRes.json();
+            author = info.author || "";
+        }
+    } 
+    catch (e) 
+    {
+        author = "";
+    }
     for (const song of songs) 
     {
-        // Fetch info.json for the current folder to get the author name
-        let author = "";
-        try 
-        {
-            let infoRes = await fetch(`/${currFolder}/info.json`);
-            if (infoRes.ok) 
-            {
-                let info = await infoRes.json();
-                author = info.author || "";
-            }
-        } 
-        catch (e) 
-        {
-            author = "";
-        }
         songUL.innerHTML = songUL.innerHTML + `<li data-filename="${song}">
                                                     <img class="invert" width="34" src="img/music.svg" alt="">
                                                     <div class="info">
@@ -183,67 +183,72 @@ function updatePlayIcons(isPlaying, trackName)
 
 async function displayAlbums() 
 {
-    let a = await fetch(`/songs/index.json`)
-    let response = await a.json();
-    let div = document.createElement("div")
-    div.innerHTML = response;
-    let anchors = div.getElementsByTagName("a")
-    let cardContainer = document.querySelector(".cardContainer")
-    let array = Array.from(anchors)
-    for (let index = 0; index < array.length; index++) 
+    let res = await fetch("/songs/index.json");
+    if (!res.ok) {
+        console.error("Cannot load albums");
+        return;
+    }
+    let folders = await res.json();
+    let cardContainer = document.querySelector(".cardContainer");
+    cardContainer.innerHTML = "";
+    for (let folder of folders) 
     {
-        const e = array[index]; 
-        if (e.href.includes("/songs") && !e.href.includes(".htaccess")) 
-        {
-            let parts = e.pathname.split("/").filter(Boolean);
-            if (parts.length < 2) continue;
-            let folder = parts[1];
-            // Get the metadata of the folder
-            let a = await fetch(`/songs/${folder}/info.json`)
-            let response = await a.json(); 
-            // Check if cover.jpg exists, if not, check for cover.png
-            let coverUrlJpg = `/songs/${folder}/cover.jpg`;
-            let coverUrlPng = `/songs/${folder}/cover.png`;
-            let coverUrl = coverUrlJpg;
-            // Try to fetch cover.jpg, if not found, use cover.png
-            try 
-            {
-                let coverRes = await fetch(coverUrlJpg, { method: "HEAD" });
-                if (!coverRes.ok) 
-                {
-                    coverRes = await fetch(coverUrlPng, { method: "HEAD" });
-                    if (coverRes.ok) 
-                    {
-                        coverUrl = coverUrlPng;
-                    }
-                }
-            } 
-            catch (e) 
-            {
-                coverUrl = coverUrlPng;
-            }
-            cardContainer.innerHTML = cardContainer.innerHTML + ` <div data-folder="${folder}" class="card">
-                                                                    <div class="play">
-                                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                                            <path d="M5 20V4L19 12L5 20Z" stroke="#141B34" fill="#000" stroke-width="1.5" stroke-linejoin="round" />
-                                                                        </svg>
-                                                                    </div>
-                                                                    <img src="${coverUrl}" alt="">
-                                                                    <h2>${response.title}</h2>
-                                                                    <p>${response.description}</p>
-                                                                </div>`
+        let info;
+        try {
+            let infoRes = await fetch(`/songs/${folder}/info.json`);
+            info = await infoRes.json();
+        } 
+        catch {
+            info = {
+                title: folder,
+                description: ""
+            };
         }
+        // Check if cover.jpg exists, if not, check for cover.png
+        let coverUrlJpg = `/songs/${folder}/cover.jpg`;
+        let coverUrlPng = `/songs/${folder}/cover.png`;
+        let coverUrl = coverUrlJpg;
+        // Try to fetch cover.jpg, if not found, use cover.png
+        try 
+        {
+            let coverRes = await fetch(coverUrlJpg, { method: "HEAD" });
+            if (!coverRes.ok) 
+            {
+                coverRes = await fetch(coverUrlPng, { method: "HEAD" });
+                if (coverRes.ok) 
+                {
+                    coverUrl = coverUrlPng;
+                }
+            }
+        } 
+        catch (e) 
+        {
+            coverUrl = coverUrlPng;
+        }
+        cardContainer.innerHTML = cardContainer.innerHTML + ` <div data-folder="${folder}" class="card">
+                                                                <div class="play">
+                                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                                        <path d="M5 20V4L19 12L5 20Z" stroke="#141B34" fill="#000" stroke-width="1.5" stroke-linejoin="round" />
+                                                                    </svg>
+                                                                </div>
+                                                                <img src="${coverUrl}" alt="">
+                                                                <h2>${info.title}</h2>
+                                                                <p>${info.description}</p>
+                                                            </div>`
     }
     // Load the playlist whenever card is clicked
-    Array.from(document.getElementsByClassName("card")).forEach(e => 
-    { 
-        e.addEventListener("click", async item => 
-        {
-            songs = await getSongs(`songs/${item.currentTarget.dataset.folder}`)  
-            playMusic(songs[0])
-
-        })
-    })
+    document.querySelectorAll(".card").forEach(card => {
+            card.addEventListener(
+                "click",
+                async e => {
+                    let folder = e.currentTarget.dataset.folder;
+                    songs = await getSongs(`songs/${folder}`);
+                    if (songs.length > 0) {
+                        playMusic(songs[0]);
+                    }
+                }
+            );
+        });
 }
 
 async function main() 
@@ -272,8 +277,10 @@ async function main()
 
     currentSong.addEventListener("ended", () => 
     {
-        let index = songs.indexOf(currentSong.src.split("/").slice(-1)[0]);
-        if ((index + 1) < songs.length)
+        let current = decodeURIComponent(currentSong.src.split("/").pop());
+
+        let index = songs.indexOf(current);
+        if (index + 1 < songs.length)
         {
             // Play the next song in list
             playMusic(songs[index + 1]);
@@ -283,16 +290,9 @@ async function main()
         {
             // Last song ended – update UI accordingly
             play.src = "img/play.svg"; // reset bottom play icon
-            updatePlayIcons(false, songs[index]); // reset play icon for the last song in the song list
+            updatePlayIcons(false, current); // reset play icon for the last song in the song list
         }
     });
-
-    // Listen for timeupdate event
-    currentSong.addEventListener("timeupdate", () => 
-    {
-        document.querySelector(".songtime").innerHTML = `${secondsToMinutesSeconds(currentSong.currentTime)} / ${secondsToMinutesSeconds(currentSong.duration)}`
-        document.querySelector(".circle").style.left = (currentSong.currentTime / currentSong.duration) * 100 + "%";
-    })
 
     // Add an event listener to seekbar
     document.querySelector(".seekbar").addEventListener("click", e => 
@@ -318,8 +318,9 @@ async function main()
     previous.addEventListener("click", () => 
     {
         currentSong.pause()
-        let index = songs.indexOf(currentSong.src.split("/").slice(-1)[0])
-        if ((index - 1) >= 0) 
+        let current = decodeURIComponent(currentSong.src.split("/").pop());
+        let index = songs.indexOf(current);
+        if (index - 1 >= 0) 
         {
             playMusic(songs[index - 1])
         }
@@ -329,8 +330,9 @@ async function main()
     next.addEventListener("click", () => 
     {
         currentSong.pause()
-        let index = songs.indexOf(currentSong.src.split("/").slice(-1)[0])
-        if ((index + 1) < songs.length) 
+        let current = decodeURIComponent(currentSong.src.split("/").pop());
+        let index = songs.indexOf(current);
+        if (index + 1 < songs.length) 
         {
             playMusic(songs[index + 1])
         }

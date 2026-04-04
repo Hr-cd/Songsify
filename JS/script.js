@@ -200,11 +200,12 @@ async function displayAlbums()
 
         for (let folder of folders) 
         {
+            const safeFolder = encodeURIComponent(folder);
             let info;
 
             try 
             {
-                let infoRes = await fetch(`/songs/${folder}/info.json`);
+                let infoRes = await fetch(`/songs/${safeFolder}/info.json`);
 
                 if (infoRes.ok) 
                 {
@@ -224,7 +225,7 @@ async function displayAlbums()
             }
 
             // Always start with JPG
-            let coverUrl = `/songs/${folder}/cover.jpg`;
+            let coverUrl = `/songs/${safeFolder}/cover.jpg`;
 
             cardContainer.innerHTML += `
                 <div data-folder="${folder}" class="card">
@@ -242,7 +243,7 @@ async function displayAlbums()
                     <img 
                         src="${coverUrl}"
                         alt="${info.title}"
-                        onerror="this.onerror=null; this.src='/songs/${folder}/cover.png';"
+                        onerror="this.onerror=null; this.src='/songs/${safeFolder}/cover.png';"
                     >
 
                     <h2>${info.title}</h2>
@@ -259,7 +260,8 @@ async function displayAlbums()
             {
                 let folder = e.currentTarget.dataset.folder;
 
-                songs = await getSongs(`songs/${folder}`);
+                const safeFolder = encodeURIComponent(folder);
+                songs = await getSongs(`songs/${safeFolder}`);
 
                 if (songs && songs.length > 0) 
                 {

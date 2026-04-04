@@ -21,7 +21,7 @@ function secondsToMinutesSeconds(seconds)
 async function getSongs(folder) 
 {
     currFolder = folder;
-    let a = await fetch(`/${currFolder}`)
+    let a = await fetch(`/${currFolder}/index.json`)
     let response = await a.text();
     let div = document.createElement("div")
     div.innerHTML = response;
@@ -181,7 +181,7 @@ function updatePlayIcons(isPlaying, trackName)
 
 async function displayAlbums() 
 {
-    let a = await fetch(`/songs/`)
+    let a = await fetch(`/songs/index.json`)
     let response = await a.text();
     let div = document.createElement("div")
     div.innerHTML = response;

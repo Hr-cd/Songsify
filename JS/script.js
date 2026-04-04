@@ -22,19 +22,21 @@ async function getSongs(folder)
 {
     currFolder = folder;
     let a = await fetch(`/${currFolder}/index.json`)
-    let response = await a.text();
-    let div = document.createElement("div")
-    div.innerHTML = response;
-    let as = div.getElementsByTagName("a")
-    songs = []
-    for (let index = 0; index < as.length; index++) 
-    {
-        const element = as[index];
-        if (element.href.endsWith(".mp3") || element.href.endsWith(".mpeg") || element.href.endsWith(".mp4")) 
-        {
-            songs.push(element.href.split(`/${currFolder}/`)[1])
-        }
-    }
+    let response = await a.json();
+    songs = response;
+    // let response = await a.text();
+    // let div = document.createElement("div")
+    // div.innerHTML = response;
+    // let as = div.getElementsByTagName("a")
+    // songs = []
+    // for (let index = 0; index < as.length; index++) 
+    // {
+    //     const element = as[index];
+    //     if (element.href.endsWith(".mp3") || element.href.endsWith(".mpeg") || element.href.endsWith(".mp4")) 
+    //     {
+    //         songs.push(element.href.split(`/${currFolder}/`)[1])
+    //     }
+    // }
     // Show all the songs in the playlist
     let songUL = document.querySelector(".songList").getElementsByTagName("ul")[0]
     songUL.innerHTML = ""
@@ -182,7 +184,7 @@ function updatePlayIcons(isPlaying, trackName)
 async function displayAlbums() 
 {
     let a = await fetch(`/songs/index.json`)
-    let response = await a.text();
+    let response = await a.json();
     let div = document.createElement("div")
     div.innerHTML = response;
     let anchors = div.getElementsByTagName("a")

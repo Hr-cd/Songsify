@@ -1,0 +1,24 @@
+{
+  "name": "songsify",
+  "version": "1.0.0",
+  "description": "Music player web application",
+  "main": "generate.js",
+  "scripts": {
+    "generate": "node generate.js",
+    "test": "echo \"No tests specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hr-cd/Songsify.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hr-cd/Songsify/issues"
+  },
+  "homepage": "https://github.com/Hr-cd/Songsify#readme",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}

@@ -26,10 +26,10 @@ body{
  }
 .home ul li{
     display: flex;
-    gap: 15px;
+    gap: 10px;
     width: 15px;
     list-style: none;
-    padding-top: 15px;
+    /* padding-top: 15px; */
     font-weight: bold;
     align-items: center;  
  }
@@ -65,6 +65,7 @@ body{
    justify-content: space-between;
    background-color: rgb(34, 34, 34);
    border-radius: 7px;
+   align-items: center;
  }
 .header > *{
    padding: 20px;
@@ -333,6 +334,12 @@ button:disabled, #next:disabled {
   padding-top: 20px;
   font-size: 14px;
   color: #b3b3b3;
+}
+.navigate{
+    display: flex;
+    gap: 70px;
+    width: 170px;
+    justify-content: flex-start; 
 }
 /* @media (max-width:1200px)
 {

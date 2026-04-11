@@ -223,7 +223,7 @@ button:disabled, #next:disabled {
 .songList{
   height: 630px;
   overflow: auto;
-  margin-bottom: 357px;
+  margin-bottom: 354px;
 }
 .seekbar{
   height: 5px;

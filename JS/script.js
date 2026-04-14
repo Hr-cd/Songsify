@@ -339,14 +339,18 @@ async function main()
     })
 
     // Add an event to volume
-    // document.querySelector(".range").getElementsByTagName("input")[0].addEventListener("change", (e) => 
-    // {
-    //     currentSong.volume = parseInt(e.target.value) / 100
-    //     if (currentSong.volume >0)
-    //     {
-    //         document.querySelector(".volume>img").src = document.querySelector(".volume>img").src.replace("mute.svg", "volume.svg")
-    //     }
-    // })
+    document.querySelector(".range").getElementsByTagName("input")[0].addEventListener("change", (e) => 
+    {
+        currentSong.volume = parseInt(e.target.value) / 100
+        if (currentSong.volume >0)
+        {
+            document.querySelector(".volume>img").src = document.querySelector(".volume>img").src.replace("mute.svg", "volume.svg")
+        }
+        else 
+        {
+            document.querySelector(".volume>img").src = document.querySelector(".volume>img").src.replace("volume.svg", "mute.svg");
+        }
+    })
 
     // Automatically play next song when current ends
     // currentSong.addEventListener("ended", () => 
@@ -466,15 +470,18 @@ async function main()
                 break;
             case "m":
                 const volumeIcon = document.querySelector(".volume>img");
+                const volumeInput = document.querySelector(".range").getElementsByTagName("input")[0];
                 if (volumeIcon.src.includes("volume.svg")) 
                 {
                     volumeIcon.src = volumeIcon.src.replace("volume.svg", "mute.svg");
                     currentSong.volume = 0;
+                    volumeInput.value = 0;
                 } 
                 else 
                 {
                     volumeIcon.src = volumeIcon.src.replace("mute.svg", "volume.svg");
                     currentSong.volume = 0.9;
+                    volumeInput.value = 90;
                 }
                 break;
         }

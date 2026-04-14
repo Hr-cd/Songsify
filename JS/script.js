@@ -4,6 +4,10 @@ let currFolder;
 let lastArrowKey = null;
 let arrowKeyTimeout = null;
 let arrowKeyCount = 0;
+let allAlbums = [];
+let currentAlbumPage = 1;
+const ALBUMS_PER_PAGE = 20;
+
 // const BASE = "http://127.0.0.1:8080/Spotify";
 function secondsToMinutesSeconds(seconds)
 {
@@ -188,10 +192,38 @@ async function displayAlbums()
         console.error("Cannot load albums");
         return;
     }
-    let folders = await res.json();
+    allAlbums = await res.json();
+    await renderAlbumPage(currentAlbumPage);
+    
+    // Attach event listeners for pagination arrows
+    document.getElementById("prev-album-page").addEventListener("click", async (e) => {
+        e.preventDefault();
+        if (currentAlbumPage > 1) {
+            currentAlbumPage--;
+            await renderAlbumPage(currentAlbumPage);
+        }
+    });
+
+    document.getElementById("next-album-page").addEventListener("click", async (e) => {
+        e.preventDefault();
+        const maxPages = Math.ceil(allAlbums.length / ALBUMS_PER_PAGE);
+        if (currentAlbumPage < maxPages) {
+            currentAlbumPage++;
+            await renderAlbumPage(currentAlbumPage);
+        }
+    });
+}
+
+async function renderAlbumPage(page) 
+{
     let cardContainer = document.querySelector(".cardContainer");
     cardContainer.innerHTML = "";
-    for (let folder of folders) 
+    
+    let start = (page - 1) * ALBUMS_PER_PAGE;
+    let end = start + ALBUMS_PER_PAGE;
+    let paginatedFolders = allAlbums.slice(start, end);
+
+    for (let folder of paginatedFolders) 
     {
         let info;
         try {
@@ -249,6 +281,17 @@ async function displayAlbums()
                 }
             );
         });
+
+    // Update pagination arrows visual state
+    const prevBtn = document.getElementById("prev-album-page");
+    const nextBtn = document.getElementById("next-album-page");
+    const maxPages = Math.ceil(allAlbums.length / ALBUMS_PER_PAGE);
+    
+    prevBtn.style.opacity = page === 1 ? "0.5" : "1";
+    prevBtn.style.pointerEvents = page === 1 ? "none" : "auto";
+    
+    nextBtn.style.opacity = page >= maxPages || maxPages === 0 ? "0.5" : "1";
+    nextBtn.style.pointerEvents = page >= maxPages || maxPages === 0 ? "none" : "auto";
 }
 
 async function main() 

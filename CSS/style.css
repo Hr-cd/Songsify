@@ -347,7 +347,7 @@ button:disabled, #next:disabled {
     flex-direction: row;
     align-items: center;
 }
-@media (max-width:1200px)
+/* @media (max-width:1200px)
 {
   .left
   {
@@ -446,8 +446,8 @@ button:disabled, #next:disabled {
     padding: 0px;
     border-radius: 50%;
   }
-}
-@media (width>=400px)
+} */
+/* @media (width>=400px)
 {
   .left
   {
@@ -552,4 +552,4 @@ button:disabled, #next:disabled {
     flex-wrap: wrap;
 
   }
-}
+} */

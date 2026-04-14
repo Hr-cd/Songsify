@@ -551,9 +551,20 @@ async function main()
         reqForm.addEventListener("submit", (e) => {
             e.preventDefault();
             const songName = document.getElementById("reqSongName").value;
-            alert(`Song request for "${songName}" submitted successfully! We will try to add it soon.`);
+            const songAuthor = document.getElementById("reqSongAuthor").value;
+            
+            // Generate a mailto link that opens the user's email client
+            const devEmail = "parayehrushikesh10@gmail.com"; // <--- CHANGE THIS TO YOUR ACTUAL EMAIL
+            const subject = encodeURIComponent(`New Song Request: ${songName}`);
+            const body = encodeURIComponent(`Hello Developer!\n\nPlease add the following song to the Spotify Clone:\n\nSender Name: ${document.getElementById("reqSongSender").value}\nSong Name: ${songName}\nAuthor: ${songAuthor}\n\nThanks!`);
+            
+            window.location.href = `mailto:${devEmail}?subject=${subject}&body=${body}`;
+
+            // Reset and close
             reqForm.reset();
             modal.close();
+            
+            alert(`Opening your email client to send the request for "${songName}"!`);
         });
     }
 }

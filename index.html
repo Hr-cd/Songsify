@@ -24,12 +24,16 @@
             </div>
             <form id="requestSongForm" style="display:flex; flex-direction:column; gap:15px; margin-top:20px;">
                 <div>
+                    <label>Your Name:</label><br>
+                    <input type="text" placeholder="Enter Your Name" id="reqSongSender" required style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:none; background:#333; color:white; outline:none;">
+                </div>
+                <div>
                     <label>Song Name:</label><br>
-                    <input type="text" id="reqSongName" required style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:none; background:#333; color:white; outline:none;">
+                    <input type="text" placeholder="Enter Song Name" id="reqSongName" required style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:none; background:#333; color:white; outline:none;">
                 </div>
                 <div>
                     <label>Song Author:</label><br>
-                    <input type="text" id="reqSongAuthor" required style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:none; background:#333; color:white; outline:none;">
+                    <input type="text" placeholder="Enter Song Author" id="reqSongAuthor" required style="width:100%; padding:10px; margin-top:5px; border-radius:5px; border:none; background:#333; color:white; outline:none;">
                 </div>
                 <button type="submit" style="width:100%; margin-top:10px; padding:12px; border-radius:20px; background:#1fdf64; color:black; font-weight:bold; font-size:15px; border:none; cursor:pointer;">Submit Request</button>
             </form>
@@ -99,7 +103,7 @@
                     <div class="home header rounded m-1 p-1">
                         <ul class="navigate">
                             <li><img class="invert" src="img/home.svg" alt="home">Home</li>
-                            <li id="request-song-btn" style="cursor:pointer;"><img class="invert" src="img/search.svg" alt="request">Request</li>
+                            <li id="request-song-btn" style="cursor:pointer;"><img class="invert" src="img/suggestion.svg" alt="request">Request</li>
                         </ul>
                     </div>
                 </div>

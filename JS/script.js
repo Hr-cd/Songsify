@@ -529,6 +529,33 @@ async function main()
                 break;
         }
     });
+    // Setup request song modal
+    const requestBtn = document.getElementById("request-song-btn");
+    const modal = document.getElementById("requestSongModal");
+    const closeBtn = document.getElementById("closeModal");
+    const reqForm = document.getElementById("requestSongForm");
+
+    if (requestBtn && modal) {
+        requestBtn.addEventListener("click", () => {
+            modal.showModal();
+        });
+    }
+
+    if (closeBtn && modal) {
+        closeBtn.addEventListener("click", () => {
+            modal.close();
+        });
+    }
+
+    if (reqForm && modal) {
+        reqForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const songName = document.getElementById("reqSongName").value;
+            alert(`Song request for "${songName}" submitted successfully! We will try to add it soon.`);
+            reqForm.reset();
+            modal.close();
+        });
+    }
 }
 
 main() 

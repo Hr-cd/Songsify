@@ -3,10 +3,17 @@ let songs;
 let currFolder;
 let lastArrowKey = null;
 let arrowKeyTimeout = null;
-let arrowKeyCount = 0;
 let allAlbums = [];
 let currentAlbumPage = 1;
 const ALBUMS_PER_PAGE = 20;
+let colorThief;
+
+// Initialize ColorThief when it's available
+document.addEventListener("DOMContentLoaded", () => {
+    if (typeof ColorThief !== "undefined") {
+        colorThief = new ColorThief();
+    }
+});
 
 // const BASE = "http://127.0.0.1:8080/Spotify";
 function secondsToMinutesSeconds(seconds)
@@ -274,6 +281,21 @@ async function renderAlbumPage(page)
                 "click",
                 async e => {
                     let folder = e.currentTarget.dataset.folder;
+                    
+                    // Dynamic Background Extraction
+                    if (colorThief) {
+                        try {
+                            const img = e.currentTarget.querySelector("img");
+                            if (img.complete) {
+                                const color = colorThief.getColor(img);
+                                const rightContainer = document.querySelector(".right");
+                                rightContainer.style.background = `linear-gradient(to bottom, rgb(${color[0]}, ${color[1]}, ${color[2]}) 0%, #121212 100%)`;
+                            }
+                        } catch(err) {
+                            console.error("Could not extract image color.", err);
+                        }
+                    }
+
                     songs = await getSongs(`songs/${folder}`);
                     if (songs.length > 0) {
                         playMusic(songs[0]);

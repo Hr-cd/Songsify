@@ -7,6 +7,8 @@ let allAlbums = [];
 let currentAlbumPage = 1;
 const ALBUMS_PER_PAGE = 20;
 let colorThief;
+let isShuffle = false;
+let isRepeat = false;
 
 // Initialize ColorThief when it's available
 document.addEventListener("DOMContentLoaded", () => {
@@ -281,7 +283,7 @@ async function renderAlbumPage(page)
                 "click",
                 async e => {
                     let folder = e.currentTarget.dataset.folder;
-                    
+
                     // Dynamic Background Extraction
                     if (colorThief) {
                         try {
@@ -340,24 +342,43 @@ async function main()
         }
     });
 
-    currentSong.addEventListener("ended", () => 
-    {
-        let current = decodeURIComponent(currentSong.src.split("/").pop());
+    const shuffleBtn = document.getElementById("shuffle");
+    const repeatBtn = document.getElementById("repeat");
 
-        let index = songs.indexOf(current);
-        if (index + 1 < songs.length)
-        {
-            // Play the next song in list
-            playMusic(songs[index + 1]);
-            // playMusic(songs[index + 0]);
-        } 
-        else 
-        {
-            // Last song ended – update UI accordingly
-            play.src = "img/play.svg"; // reset bottom play icon
-            updatePlayIcons(false, current); // reset play icon for the last song in the song list
-        }
+    shuffleBtn.addEventListener("click", () => {
+        isShuffle = !isShuffle;
+        shuffleBtn.style.opacity = isShuffle ? "1" : "0.5";
     });
+
+    repeatBtn.addEventListener("click", () => {
+        isRepeat = !isRepeat;
+        repeatBtn.style.opacity = isRepeat ? "1" : "0.5";
+    });
+
+    const playNext = () => {
+        if (!songs || songs.length === 0) return;
+        let current = decodeURIComponent(currentSong.src.split("/").pop());
+        let index = songs.indexOf(current);
+
+        if (isShuffle) {
+            let nextIndex = Math.floor(Math.random() * songs.length);
+            while (nextIndex === index && songs.length > 1) {
+                nextIndex = Math.floor(Math.random() * songs.length);
+            }
+            playMusic(songs[nextIndex]);
+        } else {
+            if (index + 1 < songs.length) {
+                playMusic(songs[index + 1]);
+            } else if (isRepeat) {
+                playMusic(songs[0]); // Loop back to start
+            } else {
+                play.src = "img/play.svg";
+                updatePlayIcons(false, current);
+            }
+        }
+    };
+
+    currentSong.addEventListener("ended", playNext);
 
     // Add an event listener to seekbar
     document.querySelector(".seekbar").addEventListener("click", e => 
@@ -382,26 +403,33 @@ async function main()
     // Add an event listener to previous
     previous.addEventListener("click", () => 
     {
-        currentSong.pause()
+        currentSong.pause();
         let current = decodeURIComponent(currentSong.src.split("/").pop());
         let index = songs.indexOf(current);
+        
+        // If the song is >3s in, restart it instead of going to previous
+        if (currentSong.currentTime > 3) {
+            currentSong.currentTime = 0;
+            currentSong.play();
+            return;
+        }
+
         if (index - 1 >= 0) 
         {
-            playMusic(songs[index - 1])
+            playMusic(songs[index - 1]);
         }
-    })
+        else if (isRepeat && songs.length > 0)
+        {
+            playMusic(songs[songs.length - 1]);
+        }
+    });
 
     // Add an event listener to next
     next.addEventListener("click", () => 
     {
-        currentSong.pause()
-        let current = decodeURIComponent(currentSong.src.split("/").pop());
-        let index = songs.indexOf(current);
-        if (index + 1 < songs.length) 
-        {
-            playMusic(songs[index + 1])
-        }
-    })
+        currentSong.pause();
+        playNext();
+    });
 
     // Add an event to volume
     document.querySelector(".range").getElementsByTagName("input")[0].addEventListener("change", (e) => 

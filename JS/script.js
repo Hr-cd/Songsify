@@ -110,6 +110,40 @@ async function getSongs(folder)
     return songs
 }
 
+async function fetchLyrics(track) 
+{
+    const lyricsContent = document.getElementById("lyricsContent");
+    if (!lyricsContent) return;
+    
+    let txtFile = track.replace(/\.(mp3|mpeg|mp4|wav|ogg)$/i, ".txt");
+    let url = `/${currFolder}/${txtFile}`;
+    
+    // Clear old lyrics while fetching
+    lyricsContent.innerHTML = "Loading lyrics...";
+    lyricsContent.classList.remove("error");
+    
+    try 
+    {
+        let res = await fetch(url);
+        if (res.ok) 
+        {
+            let text = await res.text();
+            // Optional: Escape HTML to be safe, but we just set text directly using textContent or safe innerHTML since it's local.
+            lyricsContent.textContent = text; 
+        } 
+        else 
+        {
+            lyricsContent.innerHTML = "🎵 Looks like we don't have the lyrics for this track yet.";
+            lyricsContent.classList.add("error");
+        }
+    } 
+    catch(err) 
+    {
+        lyricsContent.innerHTML = "🎵 Looks like we don't have the lyrics for this track yet.";
+        lyricsContent.classList.add("error");
+    }
+}
+
 const playMusic = (track, pause = false) => 
 {
     currentSong.src = `/${currFolder}/` + track;
@@ -127,6 +161,8 @@ const playMusic = (track, pause = false) =>
     {
         updatePlayIcons(false, track);
     }  
+    // Fetch lyrics dynamically
+    fetchLyrics(track);
 };
 
 function updatePreviousButtonState(currentIndex) 
@@ -615,6 +651,27 @@ async function main()
             modal.close();
             
             alert(`Opening your email client to send the request for "${songName}"!`);
+        });
+    }
+
+    // Setup Lyrics Panel Toggle
+    const lyricsBtn = document.getElementById("lyrics-btn");
+    const lyricsPanel = document.getElementById("lyricsPanel");
+    const closeLyrics = document.getElementById("closeLyrics");
+
+    if (lyricsBtn && lyricsPanel) {
+        lyricsBtn.addEventListener("click", () => {
+            lyricsPanel.classList.toggle("active");
+            if(lyricsPanel.classList.contains("active") && currentSong.src) {
+                const track = decodeURIComponent(currentSong.src.split("/").pop());
+                fetchLyrics(track);
+            }
+        });
+    }
+
+    if (closeLyrics && lyricsPanel) {
+        closeLyrics.addEventListener("click", () => {
+            lyricsPanel.classList.remove("active");
         });
     }
 }

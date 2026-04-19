@@ -132,7 +132,7 @@ const playMusic = (track, pause = false) =>
 function updatePreviousButtonState(currentIndex) 
 {
     const prevBtn = document.getElementById("previous");
-    if (currentIndex <= 0) 
+    if (currentIndex <= 0 && !isRepeat && !isShuffle) 
     {
         prevBtn.classList.add("disabled");
         prevBtn.style.pointerEvents = "none";
@@ -272,7 +272,7 @@ async function renderAlbumPage(page)
                                                                         <path d="M5 20V4L19 12L5 20Z" stroke="#141B34" fill="#000" stroke-width="1.5" stroke-linejoin="round" />
                                                                     </svg>
                                                                 </div>
-                                                                <img src="${coverUrl}" alt="">
+                                                                <img src="${coverUrl}" alt="cover" crossorigin="anonymous">
                                                                 <h2>${info.title}</h2>
                                                                 <p>${info.description}</p>
                                                             </div>`
@@ -283,15 +283,17 @@ async function renderAlbumPage(page)
                 "click",
                 async e => {
                     let folder = e.currentTarget.dataset.folder;
-
+                    
                     // Dynamic Background Extraction
                     if (colorThief) {
                         try {
                             const img = e.currentTarget.querySelector("img");
                             if (img.complete) {
                                 const color = colorThief.getColor(img);
-                                const rightContainer = document.querySelector(".right .left");
+                                const rightContainer = document.querySelector(".right");
                                 rightContainer.style.background = `linear-gradient(to bottom, rgb(${color[0]}, ${color[1]}, ${color[2]}) 0%, #121212 100%)`;
+                                const leftContainer = document.querySelector(".left");
+                                leftContainer.style.background = `linear-gradient(to bottom, rgb(${color[0]}, ${color[1]}, ${color[2]}) 0%, #121212 100%)`;
                             }
                         } catch(err) {
                             console.error("Could not extract image color.", err);
@@ -348,7 +350,7 @@ async function main()
     shuffleBtn.addEventListener("click", () => {
         isShuffle = !isShuffle;
         shuffleBtn.style.opacity = isShuffle ? "1" : "0.5";
-
+        
         let current = decodeURIComponent(currentSong.src.split("/").pop());
         let index = songs.indexOf(current);
         if (index !== -1) {
@@ -360,7 +362,7 @@ async function main()
     repeatBtn.addEventListener("click", () => {
         isRepeat = !isRepeat;
         repeatBtn.style.opacity = isRepeat ? "1" : "0.5";
-
+        
         let current = decodeURIComponent(currentSong.src.split("/").pop());
         let index = songs.indexOf(current);
         if (index !== -1) {
@@ -448,10 +450,10 @@ async function main()
     // Add an event to volume
     document.querySelector(".range").getElementsByTagName("input")[0].addEventListener("change", (e) => 
     {
-        currentSong.volume = parseInt(e.target.value) / 100
-        if (currentSong.volume >0)
+        currentSong.volume = parseInt(e.target.value) / 100;
+        if (currentSong.volume > 0)
         {
-            document.querySelector(".volume>img").src = document.querySelector(".volume>img").src.replace("mute.svg", "volume.svg")
+            document.querySelector(".volume>img").src = document.querySelector(".volume>img").src.replace("mute.svg", "volume.svg");
         }
         else 
         {
@@ -474,19 +476,19 @@ async function main()
     // });
 
     // Add event listener to mute the track
-    document.querySelector(".volume>img").addEventListener("click", e=>
+    document.querySelector(".volume>img").addEventListener("click", e =>
     { 
         if(e.target.src.includes("volume.svg"))
         {
-            e.target.src = e.target.src.replace("volume.svg", "mute.svg")
+            e.target.src = e.target.src.replace("volume.svg", "mute.svg");
             currentSong.volume = 0;
-            // document.querySelector(".range").getElementsByTagName("input")[0].value = 0;
+            document.querySelector(".range").getElementsByTagName("input")[0].value = 0;
         }
         else
         {
-            e.target.src = e.target.src.replace("mute.svg", "volume.svg")
+            e.target.src = e.target.src.replace("mute.svg", "volume.svg");
             currentSong.volume = .90;
-            // document.querySelector(".range").getElementsByTagName("input")[0].value = 10;
+            document.querySelector(".range").getElementsByTagName("input")[0].value = 90;
         }
     })
 
@@ -620,7 +622,7 @@ async function main()
             // Generate a mailto link that opens the user's email client
             const devEmail = "parayehrushikesh10@gmail.com"; // <--- CHANGE THIS TO YOUR ACTUAL EMAIL
             const subject = encodeURIComponent(`New Song Request: ${songName}`);
-            const body = encodeURIComponent(`Hello Developer!\n\nPlease add the following song to the Spotify Clone:\n\nSender Name: ${document.getElementById("reqSongSender").value}\nSong Name: ${songName}\nAuthor: ${songAuthor}\n\nThanks!`);
+            const body = encodeURIComponent(`Hello Developer!\n\nPlease add the following song to the Spotify Clone:\n\nSong Name: ${songName}\nAuthor: ${songAuthor}\n\nThanks!`);
             
             window.location.href = `mailto:${devEmail}?subject=${subject}&body=${body}`;
 
@@ -633,4 +635,4 @@ async function main()
     }
 }
 
-main() 
+main()  

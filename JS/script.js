@@ -149,7 +149,7 @@ function updatePreviousButtonState(currentIndex)
 function updateNextButtonState(currentIndex) 
 {
     const nextBtn = document.getElementById("next");
-    if (currentIndex >= songs.length - 1) 
+    if (currentIndex >= songs.length - 1 && !isRepeat && !isShuffle) 
     {
         nextBtn.classList.add("disabled");
         nextBtn.style.pointerEvents = "none";
@@ -348,11 +348,25 @@ async function main()
     shuffleBtn.addEventListener("click", () => {
         isShuffle = !isShuffle;
         shuffleBtn.style.opacity = isShuffle ? "1" : "0.5";
+
+        let current = decodeURIComponent(currentSong.src.split("/").pop());
+        let index = songs.indexOf(current);
+        if (index !== -1) {
+            updateNextButtonState(index);
+            updatePreviousButtonState(index);
+        }
     });
 
     repeatBtn.addEventListener("click", () => {
         isRepeat = !isRepeat;
         repeatBtn.style.opacity = isRepeat ? "1" : "0.5";
+
+        let current = decodeURIComponent(currentSong.src.split("/").pop());
+        let index = songs.indexOf(current);
+        if (index !== -1) {
+            updateNextButtonState(index);
+            updatePreviousButtonState(index);
+        }
     });
 
     const playNext = () => {

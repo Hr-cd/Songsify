@@ -292,8 +292,8 @@ async function renderAlbumPage(page)
                                 const color = colorThief.getColor(img);
                                 const rightContainer = document.querySelector(".right");
                                 rightContainer.style.background = `linear-gradient(to bottom, rgb(${color[0]}, ${color[1]}, ${color[2]}) 0%, #121212 100%)`;
-                                const leftContainer = document.querySelector(".left");
-                                leftContainer.style.background = `linear-gradient(to bottom, rgb(${color[0]}, ${color[1]}, ${color[2]}) 0%, #121212 100%)`;
+                                // const leftContainer = document.querySelector(".left");
+                                // leftContainer.style.background = `linear-gradient(to bottom, rgb(${color[0]}, ${color[1]}, ${color[2]}) 0%, #121212 100%)`;
                             }
                         } catch(err) {
                             console.error("Could not extract image color.", err);

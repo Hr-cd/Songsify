@@ -290,7 +290,7 @@ async function renderAlbumPage(page)
                             const img = e.currentTarget.querySelector("img");
                             if (img.complete) {
                                 const color = colorThief.getColor(img);
-                                const rightContainer = document.querySelector(".right, .left");
+                                const rightContainer = document.querySelector(".right .left");
                                 rightContainer.style.background = `linear-gradient(to bottom, rgb(${color[0]}, ${color[1]}, ${color[2]}) 0%, #121212 100%)`;
                             }
                         } catch(err) {
